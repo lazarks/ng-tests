@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
-import { delay, interval, of, take, throwError } from 'rxjs';
+import { delay, interval, last, of, take, throwError } from 'rxjs';
 import { TwainService } from 'src/app/services/twain.service';
 
 import { AboutComponent } from './about.component';
@@ -135,8 +135,27 @@ describe('AboutComponent', () => {
     })
   }));
 
-  it('')
+  it('should show last quote (quote done)', (done: DoneFn) => {
+    fixture.detectChanges();
 
+    component.quote.pipe(last()).subscribe(() => {
+      fixture.detectChanges();
+      expect(quoteEl.textContent).toBe(testQuote);
+      expect(errorMessage()).withContext('should not show error').toBeNull();
+      done();
+    });
+  });
+
+  it('should show quote after getQuote (spy done)', (done: DoneFn) => {
+    fixture.detectChanges();
+
+    getQuoteSpy.calls.mostRecent().returnValue.subscribe(() => {
+      fixture.detectChanges();
+      expect(quoteEl.textContent).toBe(testQuote);
+      expect(errorMessage()).withContext('should not show error').toBeNull();
+      done();
+    })
+  })
 });
 
 describe('use jasmine.clock()', () => {
