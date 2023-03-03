@@ -53,7 +53,40 @@ describe('AboutComponent', () => {
 
     expect(errorMessage()).withContext('should display error').toMatch(/test failure/, );
     expect(quoteEl.textContent).withContext('should show placeholder').toBe('...');
-  }))
+  }));
 
+  it('should run timeout callback with delay after call tick with millis', fakeAsync(() => {
+    let called = false;
+    setTimeout(() => {
+      called = true
+    }, 100);
+    tick(100);
+    expect(called).toBe(true);
+  }));
+
+  it('should run new macro task callback with delay after call tick with millis', fakeAsync(() => {
+    function nestedTimer(cb: () => any): void {
+      setTimeout(() => setTimeout(() => cb()));
+    }
+    const callback = jasmine.createSpy('callback');
+    nestedTimer(callback);
+    expect(callback).not.toHaveBeenCalled();
+    tick(0);
+    expect(callback).toHaveBeenCalled();
+  }));
+
+  it('should not run new macro task callback with delay after call tick with millis', fakeAsync(() => {
+    function nestedTimer(cb: () => any): void {
+      setTimeout(() => setTimeout(() => cb()));
+    }
+    
+    const callback = jasmine.createSpy('callback');
+    nestedTimer(callback);
+    expect(callback).not.toHaveBeenCalled();
+    tick(0, {processNewMacroTasksSynchronously: false});
+    expect(callback).not.toHaveBeenCalled();
+    tick(0);
+    expect(callback).toHaveBeenCalled();
+  }))
 
 });
