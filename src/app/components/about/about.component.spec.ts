@@ -87,6 +87,20 @@ describe('AboutComponent', () => {
     expect(callback).not.toHaveBeenCalled();
     tick(0);
     expect(callback).toHaveBeenCalled();
-  }))
+  }));
+});
 
+describe('use jasmine.clock()', () => {
+  // config __zone_symbol__fakeAsyncPatchLock flag
+  // before loading zone.js/testing in src/test.ts
+  beforeEach(() => jasmine.clock().install());
+  afterEach(() => jasmine.clock().uninstall());
+
+  it('should auto enter fakeAsync', () => {
+    let called = false;
+    setTimeout(() => called = true, 100);
+    jasmine.clock().tick(100);
+
+    expect(called).toBe(true);
+  })
 });
