@@ -1,5 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
+import { of, throwError } from 'rxjs';
 import { TwainService } from 'src/app/services/twain.service';
 
 import { AboutComponent } from './about.component';
@@ -10,6 +10,11 @@ describe('AboutComponent', () => {
   let testQuote: string;
   let getQuoteSpy: any;
   let quoteEl: HTMLElement;
+
+  const errorMessage = () => {
+    const el = fixture.nativeElement.querySelector('.error');
+    return el ? el.textContent : null;
+  }
 
   beforeEach(async () => {
     testQuote = 'Test Quote';
@@ -27,7 +32,6 @@ describe('AboutComponent', () => {
     fixture = TestBed.createComponent(AboutComponent);
     component = fixture.componentInstance;
     quoteEl = fixture.nativeElement.querySelector('.twain');
-    fixture.detectChanges();
   });
 
   it('should create', () => {
@@ -38,5 +42,18 @@ describe('AboutComponent', () => {
     fixture.detectChanges();
     expect(quoteEl.textContent).toBe(testQuote);
     expect(getQuoteSpy.calls.any()).withContext('getQuote called').toBe(true);
-  })
+  });
+
+  it('should display error when TwainService fails', fakeAsync(() => {
+    getQuoteSpy.and.returnValue(throwError(() => new Error('TwainService test failure')));
+    
+    fixture.detectChanges();
+    tick();
+    fixture.detectChanges();
+
+    expect(errorMessage()).withContext('should display error').toMatch(/test failure/, );
+    expect(quoteEl.textContent).withContext('should show placeholder').toBe('...');
+  }))
+
+
 });
