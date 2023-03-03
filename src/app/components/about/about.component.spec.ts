@@ -112,6 +112,17 @@ describe('AboutComponent', () => {
     tick(1000);
     expect(dateDiff).toBe(2000);
   }));
+
+  it('should show quote after getQuote (fakeAsync)', fakeAsync(() => {
+    fixture.detectChanges();  // ngOnInit()
+    // expect(quoteEl.textContent).withContext('should show placeholder').toBe('...');
+    tick();                   // flush the observable to get the quote
+    fixture.detectChanges();  // update view
+
+    expect(quoteEl.textContent).withContext('should show quote').toBe(testQuote);
+    expect(errorMessage()).withContext('should not show error').toBeNull();
+  }))
+
 });
 
 describe('use jasmine.clock()', () => {
