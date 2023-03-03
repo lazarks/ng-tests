@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
-import { of, throwError } from 'rxjs';
+import { delay, interval, of, take, throwError } from 'rxjs';
 import { TwainService } from 'src/app/services/twain.service';
 
 import { AboutComponent } from './about.component';
@@ -87,6 +87,30 @@ describe('AboutComponent', () => {
     expect(callback).not.toHaveBeenCalled();
     tick(0);
     expect(callback).toHaveBeenCalled();
+  }));
+
+  it('should get Date diff correctly in fakeAsync', fakeAsync(() => {
+    const start = Date.now();
+    tick(100);
+    const end = Date.now();
+    expect(end - start).toBe(100);
+  }));
+
+  it('should get Date diff correctly in fakeAsync with rxjs scheduler', fakeAsync(() => {
+    let result = '';
+    of('hello').pipe(delay(1000)).subscribe(v => result = v);
+    expect(result).toBe('');
+    tick(1000);
+    expect(result).toBe('hello');
+
+    const start = new Date().getTime();
+    let dateDiff = 0;
+    interval(1000).pipe(take(2)).subscribe(() => dateDiff = (new Date().getTime() - start));
+
+    tick(1000);
+    expect(dateDiff).toBe(1000);
+    tick(1000);
+    expect(dateDiff).toBe(2000);
   }));
 });
 
