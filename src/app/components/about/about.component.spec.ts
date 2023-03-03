@@ -121,7 +121,21 @@ describe('AboutComponent', () => {
 
     expect(quoteEl.textContent).withContext('should show quote').toBe(testQuote);
     expect(errorMessage()).withContext('should not show error').toBeNull();
-  }))
+  }));
+
+  // waitForAsync()
+  it('should show quote after getQuote (waitForAsync)', waitForAsync(() => {
+    // fixture.detectChanges();
+    // expect(quoteEl.textContent).withContext('should show placeholder').toBe('...');
+
+    fixture.whenStable().then(() => { // wait ofr async getQuote
+      fixture.detectChanges();
+      expect(quoteEl.textContent).toBe(testQuote);
+      expect(errorMessage()).withContext('should not show error').toBeNull();
+    })
+  }));
+
+  it('')
 
 });
 
